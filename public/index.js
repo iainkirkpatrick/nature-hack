@@ -7,16 +7,20 @@ var moment = require('moment');
 require('moment-range');
 var noUiSlider = require('nouislider');
 
-console.log(process.env.IAIN_MAPBOX_ACCESS_TOKEN);
-
-// L.mapbox.accessToken = 'pk.eyJ1IjoiZW52aW50YWdlIiwiYSI6Inh6U0p2bkEifQ.p6VrrwOc_w0Ij-iTj7Zz8A'
-// var map = L.mapbox.map('map', 'envintage.i9eofp14')
-
 L.mapbox.accessToken = 'pk.eyJ1IjoicGV0ZXJqYWNvYnNvbiIsImEiOiJjaWdvanNzcWIwMDVrdHBrbmw0ZWhucGk5In0.MCT1z9mph_aJCV8bZX_O_g'
 var map = L.mapbox.map('map', 'peterjacobson.o3j3ep1p')
 map.setView([-41.112, 172.694], 6)
 
-var pointDataLayer = L.mapbox.featureLayer().addTo(map)
+var pointDataLayer = L.mapbox.featureLayer({
+    "type": "FeatureCollection",
+    "features": []
+  }, {
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, {
+      radius: 5
+    })
+  }
+}).addTo(map)
 
 var earliestDate = Date.parse("2020-12-25");
 var latestDate = Date.parse("1600-12-25");
@@ -82,13 +86,7 @@ function populateMap(occurenceName) {
       }
     }).then(function(data){
       // var geoJson = L.geoJson(data, {
-        pointDataLayer.setGeoJSON(data, {
-        pointToLayer: function(feature, latlng) {
-          return L.circleMarker(latlng, {
-            radius: 5
-          })
-        }
-      });
+      pointDataLayer.setGeoJSON(data)
       setupSlider();
     });
 }
