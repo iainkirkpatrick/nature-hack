@@ -1,4 +1,5 @@
 require('mapbox.js')
+r = require('rethinkdb');
 
 console.log(process.env.IAIN_MAPBOX_ACCESS_TOKEN);
 
@@ -10,7 +11,6 @@ var map = L.mapbox.map('map', 'peterjacobson.o3j3ep1p')
 map.setView([-41.112, 172.694], 6)
 
 var pointDataLayer = L.mapbox.featureLayer().addTo(map)
-
 
 var sampleGeoJson = {
   "type": "FeatureCollection",

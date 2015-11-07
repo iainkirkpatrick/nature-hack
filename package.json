@@ -4,12 +4,14 @@
   "author": "iainkirkpatrick",
   "main": "server.js",
   "scripts": {
+    "build": "browserify public/index.js -o public/bundle.js",
     "start": "budo public/index.js:public/bundle.js --live --verbose --debug",
     "heroku": "node server.js"
   },
   "dependencies": {
     "express": "^4.13.3",
-    "mapbox.js": "^2.2.3"
+    "mapbox.js": "^2.2.3",
+    "rethinkdb": "^2.1.1"
   },
   "devDependencies": {
     "babelify": "^6.1.3",
