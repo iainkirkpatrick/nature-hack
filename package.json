@@ -7,7 +7,7 @@
     "heroku": "node server.js"
   },
   "dependencies": {
-    "express": "*"
+    "express": "^4.13.3"
   },
   "engines": {
     "node": "0.10.x"
