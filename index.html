@@ -10,10 +10,12 @@
 <body>
   <div class='container'>
     <h1 class='title'>Fungus Time!</h1>
-    <label for='dropdown'>Species Name:</label>
+    <label class='label' for='dropdown'>Species Name:</label>
     <select id='dropdown'></select>
-    <div class='slider' id='slider'></div>
-    <!-- <div class='current-date' id='current-date'></div> -->
+    <div class='current-date-container'>
+      <span class='current-date label' id='current-date'></span>
+      <div class='slider' id='slider'></div>
+    </div>
   </div>
   <div class='map' id='map'></div>
   <script src="bundle.js"></script>

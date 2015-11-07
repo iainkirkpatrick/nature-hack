@@ -100,6 +100,7 @@ function setupSlider() {
     months.push(moment);
   });
   var slider = document.getElementById('slider');
+  var currentDate = document.getElementById('current-date');
   if (slider.noUiSlider) slider.noUiSlider.destroy();
   noUiSlider.create(slider, {
     start: 0,
@@ -114,6 +115,7 @@ function setupSlider() {
   	console.log(months[+values[handle]]);
     var sliderDate = months[+values[handle]];
     var sliderMonths = (sliderDate.get('year') * 12) + sliderDate.get('month');
+    currentDate.innerHTML = 'DATE (' + sliderDate.format('YYYY MMM') + '):';
     pointDataLayer.setFilter(function(d) {
       // return (d.properties.Date.get('month') === sliderDate.get('month')) && (d.properties.Date.get('year') === sliderDate.get('year'));
       var dMonths = (d.properties.Date.get('year') * 12) + d.properties.Date.get('month')
