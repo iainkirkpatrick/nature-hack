@@ -17,7 +17,7 @@ var pointDataLayer = L.mapbox.featureLayer({
   }, {
   pointToLayer: function(feature, latlng) {
     return L.circleMarker(latlng, {
-      radius: 5
+      radius: 10
     })
   }
 }).addTo(map)
