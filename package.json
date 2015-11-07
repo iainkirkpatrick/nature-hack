@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "author": "iainkirkpatrick",
   "main": "server.js",
+  "scripts": {
+    "heroku": "node server.js"
+  }
   "dependencies": {
     "express": "*"
   },
