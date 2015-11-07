@@ -3,6 +3,10 @@ require('es6-promise').polyfill();
 require('isomorphic-fetch');
 r = require('rethinkdb');
 
+var moment = require('moment');
+require('moment-range');
+var noUiSlider = require('nouislider');
+
 console.log(process.env.IAIN_MAPBOX_ACCESS_TOKEN);
 
 // L.mapbox.accessToken = 'pk.eyJ1IjoiZW52aW50YWdlIiwiYSI6Inh6U0p2bkEifQ.p6VrrwOc_w0Ij-iTj7Zz8A'
@@ -13,6 +17,9 @@ var map = L.mapbox.map('map', 'peterjacobson.o3j3ep1p')
 map.setView([-41.112, 172.694], 6)
 
 var pointDataLayer = L.mapbox.featureLayer().addTo(map)
+
+var earliestDate = Date.parse("2020-12-25");
+var latestDate = Date.parse("1600-12-25");
 
 fetch('/datasets/nzfapdc/Nectria')
   .then(function(response) {
@@ -25,11 +32,14 @@ fetch('/datasets/nzfapdc/Nectria')
     return {
       "type": "FeatureCollection",
       "features": data.map(function(d) {
+        var parsedDate = Date.parse(d["Event Date - parsed"]);
+        earliestDate = parsedDate < earliestDate ? parsedDate : earliestDate;
+        latestDate = parsedDate > latestDate ? parsedDate : latestDate;
         return {
           "type": "Feature",
           "properties": {
             "Name": d["Matched Scientific Name"],
-            "Date": d["Event Date - parsed"]
+            "Date": moment(parsedDate)
           },
           "geometry": {
             "type": "Point",
@@ -42,62 +52,40 @@ fetch('/datasets/nzfapdc/Nectria')
       })
     }
   }).then(function(data){
-    var geoJson = L.geoJson(data, {
+    // var geoJson = L.geoJson(data, {
+      pointDataLayer.setGeoJSON(data, {
       pointToLayer: function(feature, latlng) {
         return L.circleMarker(latlng, {
           radius: 5
         })
       }
-    }).addTo(map)
+    });
+    setupSlider();
   });
 
 
-// var sampleGeoJson = {
-//   "type": "FeatureCollection",
-//   "features": [
-//     {
-//       "type": "Feature",
-//       "properties": {},
-//       "geometry": {
-//         "type": "Point",
-//         "coordinates": [
-//           175.78125,
-//           -38.8225909761771
-//         ]
-//       }
-//     },
-//     {
-//       "type": "Feature",
-//       "properties": {},
-//       "geometry": {
-//         "type": "Point",
-//         "coordinates": [
-//           175.166015625,
-//           -39.232253141714885
-//         ]
-//       }
-//     },
-//     {
-//       "type": "Feature",
-//       "properties": {},
-//       "geometry": {
-//         "type": "Point",
-//         "coordinates": [
-//           176.00097656249997,
-//           -39.36827914916012
-//         ]
-//       }
-//     },
-//     {
-//       "type": "Feature",
-//       "properties": {},
-//       "geometry": {
-//         "type": "Point",
-//         "coordinates": [
-//           175.4296875,
-//           -39.67337039176559
-//         ]
-//       }
-//     }
-//   ]
-// }
+function setupSlider() {
+  var months = [];
+  var range = moment.range(new Date(earliestDate), new Date(latestDate));
+  range.by('months', function(moment) {
+    months.push(moment);
+  });
+  var slider = document.getElementById('slider');
+  noUiSlider.create(slider, {
+    start: 0,
+    step: 1,
+    connect: "lower",
+    range: {
+      min: 0,
+      max: months.length
+    }
+  });
+  slider.noUiSlider.on('update', function( values, handle ) {
+  	console.log(months[+values[handle]]);
+    var sliderDate = months[+values[handle]];
+    pointDataLayer.setFilter(function(d) {
+      return (d.properties.Date.get('month') === sliderDate.get('month')) && (d.properties.Date.get('year') === sliderDate.get('year'));
+      //return true;
+    })
+  });
+}
