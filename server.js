@@ -18,11 +18,11 @@ app.get('/', function(req, res) {
   res.sendfile('index.html');
 });
 
-app.get('/datasets/nzfapdc', function(req, res) {
+app.get('/datasets/nzfapdc/:name', function(req, res) {
   var connection = null;
   r.connect(config.rethinkdb).then(function(conn) {
     connection = conn;
-    return r.table('nzfapdc').limit(20).run(connection)
+    return r.table('nzfapdc').filter({"Matched Scientific Name": req.params.name}).run(connection)
   }).then(function(cursor) {
     return cursor.toArray();
   }).then(function(result) {
