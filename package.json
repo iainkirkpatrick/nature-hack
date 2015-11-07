@@ -8,8 +8,8 @@
     "heroku": "node server.js"
   },
   "dependencies": {
-    "mapbox": "^0.10.0"
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "mapbox.js": "^2.2.3"
   },
   "devDependencies": {
     "babelify": "^6.1.3",
