@@ -21,7 +21,7 @@ var pointDataLayer = L.mapbox.featureLayer().addTo(map)
 var earliestDate = Date.parse("2020-12-25");
 var latestDate = Date.parse("1600-12-25");
 
-fetch('/datasets/nzfapdc/Nectria')
+fetch('/datasets/nzfapdc/dropdown')
   .then(function(response) {
     if (response.status >= 400) {
       throw new Error("Bad response from server");
@@ -29,40 +29,69 @@ fetch('/datasets/nzfapdc/Nectria')
     return response.json();
   })
   .then(function(data) {
-    return {
-      "type": "FeatureCollection",
-      "features": data.map(function(d) {
-        var parsedDate = Date.parse(d["Event Date - parsed"]);
-        earliestDate = parsedDate < earliestDate ? parsedDate : earliestDate;
-        latestDate = parsedDate > latestDate ? parsedDate : latestDate;
-        return {
-          "type": "Feature",
-          "properties": {
-            "Name": d["Matched Scientific Name"],
-            "Date": moment(parsedDate)
-          },
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              +d["Longitude - processed"],
-              +d["Latitude - processed"]
-            ]
-          }
-        }
-      })
-    }
-  }).then(function(data){
-    // var geoJson = L.geoJson(data, {
-      pointDataLayer.setGeoJSON(data, {
-      pointToLayer: function(feature, latlng) {
-        return L.circleMarker(latlng, {
-          radius: 5
-        })
-      }
+    var dropdown = document.getElementById('dropdown');
+    dropdown.onchange = function() {
+      populateMap(dropdown.options[dropdown.selectedIndex].value);
+    };
+    var fragment = document.createDocumentFragment();
+
+    data.forEach(function(occurence, index) {
+      var opt = document.createElement('option');
+      var occurenceLabel = occurence.group + ' (' + occurence.reduction + ')';
+      opt.innerHTML = occurenceLabel;
+      opt.value = occurence.group;
+      fragment.appendChild(opt);
     });
-    setupSlider();
+
+    dropdown.appendChild(fragment);
+    populateMap(dropdown.options[dropdown.selectedIndex].value);
   });
 
+function populateMap(occurenceName) {
+  console.log(occurenceName);
+  fetch('/datasets/nzfapdc/species/'+occurenceName)
+    .then(function(response) {
+      if (response.status >= 400) {
+        throw new Error("Bad response from server");
+      }
+      return response.json();
+    })
+    .then(function(data) {
+      console.log(data);
+      return {
+        "type": "FeatureCollection",
+        "features": data.map(function(d) {
+          var parsedDate = Date.parse(d["Event Date - parsed"]);
+          earliestDate = parsedDate < earliestDate ? parsedDate : earliestDate;
+          latestDate = parsedDate > latestDate ? parsedDate : latestDate;
+          return {
+            "type": "Feature",
+            "properties": {
+              "Name": d["Matched Scientific Name"],
+              "Date": moment(parsedDate)
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                +d["Longitude - processed"],
+                +d["Latitude - processed"]
+              ]
+            }
+          }
+        })
+      }
+    }).then(function(data){
+      // var geoJson = L.geoJson(data, {
+        pointDataLayer.setGeoJSON(data, {
+        pointToLayer: function(feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 5
+          })
+        }
+      });
+      setupSlider();
+    });
+}
 
 function setupSlider() {
   var months = [];
@@ -71,6 +100,7 @@ function setupSlider() {
     months.push(moment);
   });
   var slider = document.getElementById('slider');
+  if (slider.noUiSlider) slider.noUiSlider.destroy();
   noUiSlider.create(slider, {
     start: 0,
     step: 1,
