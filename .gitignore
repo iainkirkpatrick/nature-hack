@@ -28,3 +28,12 @@ node_modules
 
 # Deal with it. [Jon]
 rethinkdb_data/*
+
+# AWS keys
+*.pem
+rootkey.csv
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
