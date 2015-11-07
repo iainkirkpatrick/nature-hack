@@ -83,8 +83,11 @@ function setupSlider() {
   slider.noUiSlider.on('update', function( values, handle ) {
   	console.log(months[+values[handle]]);
     var sliderDate = months[+values[handle]];
+    var sliderMonths = (sliderDate.get('year') * 12) + sliderDate.get('month');
     pointDataLayer.setFilter(function(d) {
-      return (d.properties.Date.get('month') === sliderDate.get('month')) && (d.properties.Date.get('year') === sliderDate.get('year'));
+      // return (d.properties.Date.get('month') === sliderDate.get('month')) && (d.properties.Date.get('year') === sliderDate.get('year'));
+      var dMonths = (d.properties.Date.get('year') * 12) + d.properties.Date.get('month')
+      return Math.abs(sliderMonths - dMonths) <= 24;
       //return true;
     })
   });
